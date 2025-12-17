@@ -377,8 +377,11 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
 
   const dataURL = canvas.toDataURL('image/png');
   const win = window.open();
-  win.document.write(`
+ w.document.write(`
+  <html>
+  <head>
     <title>BCVITO.IO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       body {
         margin: 0;
@@ -390,12 +393,17 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
       }
       img {
         max-width: 100%;
-        height: auto;
+        max-height: 100%;
+        object-fit: contain;
       }
     </style>
-    <img src="${dataURL}">
-  `);
-}
+  </head>
+  <body>
+    <img src="${img}">
+  </body>
+  </html>
+`);
+
   </script>
   
 <footer style="position:fixed;bottom:0;width:100%;text-align:center;padding:10px;font-size:13px;background:rgba(0,0,0,0.6);color:#ccc;">
@@ -408,6 +416,7 @@ Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: <a href="mailto:
 
 </body>
 </html>
+
 
 
 

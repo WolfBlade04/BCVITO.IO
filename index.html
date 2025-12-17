@@ -265,72 +265,97 @@ function generarImagen() {
     return;
   }
 
-  // 1️⃣ Abrir pestaña inmediatamente (clave)
+  // 1️⃣ Abrir pestaña inmediatamente (clave anti-bloqueo)
   const nuevaVentana = window.open('', '_blank');
   if (!nuevaVentana) {
-    alert('El navegador bloqueó la ventana. Permite popups.');
+    alert('Permite ventanas emergentes para este sitio');
     return;
   }
 
-  // 2️⃣ Crear canvas
+  // 2️⃣ Crear canvas Instagram
   const canvas = document.createElement('canvas');
-  canvas.width = 900;
-  canvas.height = 500;
+  canvas.width = 1080;
+  canvas.height = 1080;
   const ctx = canvas.getContext('2d');
 
-  // Fondo
-  ctx.fillStyle = '#0f0f0f';
+  // 3️⃣ Fondo bandera de Venezuela
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, '#F4D03F');
+  grad.addColorStop(0.33, '#F4D03F');
+  grad.addColorStop(0.33, '#0033A0');
+  grad.addColorStop(0.66, '#0033A0');
+  grad.addColorStop(0.66, '#D52B1E');
+  grad.addColorStop(1, '#D52B1E');
+
+  ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Texto
-  ctx.fillStyle = '#ffffff';
-  ctx.textAlign = 'left';
+  // Overlay oscuro
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.font = 'bold 30px Arial';
-  ctx.fillText('Conversión USD → VES', 40, 60);
+  // 4️⃣ Cargar logo
+  const logo = new Image();
+  logo.src = 'logo-bcvito.png';
 
-  ctx.font = '22px Arial';
-  ctx.fillText(`USD: $${ultimoResultado.usd}`, 40, 140);
-  ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa}`, 40, 180);
+  logo.onload = () => {
 
-  ctx.font = 'bold 26px Arial';
-  ctx.fillText(`TOTAL: Bs ${ultimoResultado.total}`, 40, 240);
+    // Logo centrado arriba
+    ctx.drawImage(logo, 440, 80, 200, 200);
 
-  ctx.font = '16px Arial';
-  ctx.fillText(
-    ultimoResultado.fecha.toLocaleDateString('es-VE') + ' ' +
-    ultimoResultado.fecha.toLocaleTimeString('es-VE'),
-    40,
-    290
-  );
+    // Texto centrado
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
 
-  ctx.font = 'italic 18px Arial';
-  ctx.fillText('Gracias por usar BCVITO.IO', 40, 340);
+    ctx.font = 'bold 60px Arial';
+    ctx.fillText('Conversión USD → VES', 540, 360);
 
-  // 3️⃣ Convertir imagen
-  const dataURL = canvas.toDataURL('image/png');
+    ctx.font = '48px Arial';
+    ctx.fillText(`USD: $${ultimoResultado.usd}`, 540, 480);
+    ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa}`, 540, 550);
 
-  // 4️⃣ Escribir imagen en la pestaña
-  nuevaVentana.document.write(`
-    <title>BCVITO.IO</title>
-    <style>
-      body {
-        margin: 0;
-        background: #000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      img {
-        max-width: 100%;
-        height: auto;
-      }
-    </style>
-    <img src="${dataURL}" alt="BCVITO.IO">
-  `);
+    ctx.font = 'bold 70px Arial';
+    ctx.fillText(`TOTAL: Bs ${ultimoResultado.total}`, 540, 650);
 
-  nuevaVentana.document.close();
+    ctx.font = '32px Arial';
+    ctx.fillText(
+      ultimoResultado.fecha.toLocaleDateString('es-VE') +
+      ' ' +
+      ultimoResultado.fecha.toLocaleTimeString('es-VE'),
+      540,
+      720
+    );
+
+    ctx.font = 'italic 36px Arial';
+    ctx.fillText('Gracias por usar BCVITO.IO', 540, 840);
+
+    ctx.font = '28px Arial';
+    ctx.fillText('bcvito.io · Referencia informativa', 540, 900);
+
+    // 5️⃣ Mostrar imagen en la pestaña
+    const dataURL = canvas.toDataURL('image/png');
+
+    nuevaVentana.document.write(`
+      <title>BCVITO.IO</title>
+      <style>
+        body {
+          margin: 0;
+          background: #000;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+        }
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      </style>
+      <img src="${dataURL}" alt="BCVITO.IO">
+    `);
+
+    nuevaVentana.document.close();
+  };
 }
 
   </script>
@@ -341,3 +366,4 @@ function generarImagen() {
 
 </body>
 </html>
+

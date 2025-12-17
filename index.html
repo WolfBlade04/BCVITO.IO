@@ -265,99 +265,137 @@ function generarImagen() {
     return;
   }
 
-  // 1️⃣ Abrir pestaña inmediatamente (clave anti-bloqueo)
-  const nuevaVentana = window.open('', '_blank');
-  if (!nuevaVentana) {
-    alert('Permite ventanas emergentes para este sitio');
-    return;
-  }
-
-  // 2️⃣ Crear canvas Instagram
   const canvas = document.createElement('canvas');
   canvas.width = 1080;
   canvas.height = 1080;
   const ctx = canvas.getContext('2d');
 
-  // 3️⃣ Fondo bandera de Venezuela
-  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  grad.addColorStop(0, '#F4D03F');
-  grad.addColorStop(0.33, '#F4D03F');
-  grad.addColorStop(0.33, '#0033A0');
-  grad.addColorStop(0.66, '#0033A0');
-  grad.addColorStop(0.66, '#D52B1E');
-  grad.addColorStop(1, '#D52B1E');
+  /* ===============================
+     FONDO BANDERA DE VENEZUELA
+  =============================== */
 
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Amarillo
+  ctx.fillStyle = '#F4D03F';
+  ctx.fillRect(0, 0, 1080, 360);
 
-  // Overlay oscuro
+  // Azul
+  ctx.fillStyle = '#0033A0';
+  ctx.fillRect(0, 360, 1080, 360);
+
+  // Rojo
+  ctx.fillStyle = '#D52B1E';
+  ctx.fillRect(0, 720, 1080, 360);
+
+  // Overlay oscuro para legibilidad
   ctx.fillStyle = 'rgba(0,0,0,0.55)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, 1080, 1080);
 
-  // 4️⃣ Cargar logo
-  const logo = new Image();
-  logo.src = 'logo-bcvito.png';
+  /* ===============================
+     ESTRELLAS (8 en arco)
+  =============================== */
+  function dibujarEstrella(cx, cy, r, spikes = 5) {
+    let rot = Math.PI / 2 * 3;
+    let x = cx;
+    let y = cy;
+    const step = Math.PI / spikes;
 
-  logo.onload = () => {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r);
 
-    // Logo centrado arriba
-    ctx.drawImage(logo, 440, 80, 200, 200);
+    for (let i = 0; i < spikes; i++) {
+      x = cx + Math.cos(rot) * r;
+      y = cy + Math.sin(rot) * r;
+      ctx.lineTo(x, y);
+      rot += step;
 
-    // Texto centrado
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
+      x = cx + Math.cos(rot) * (r / 2);
+      y = cy + Math.sin(rot) * (r / 2);
+      ctx.lineTo(x, y);
+      rot += step;
+    }
 
-    ctx.font = 'bold 60px Arial';
-    ctx.fillText('Conversión USD → VES', 540, 360);
+    ctx.lineTo(cx, cy - r);
+    ctx.closePath();
+    ctx.fill();
+  }
 
-    ctx.font = '48px Arial';
-    ctx.fillText(`USD: $${ultimoResultado.usd}`, 540, 480);
-    ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa}`, 540, 550);
+  ctx.fillStyle = '#FFFFFF';
 
-    ctx.font = 'bold 70px Arial';
-    ctx.fillText(`TOTAL: Bs ${ultimoResultado.total}`, 540, 650);
+  const centerX = 540;
+  const centerY = 540;
+  const radius = 180;
 
-    ctx.font = '32px Arial';
-    ctx.fillText(
-      ultimoResultado.fecha.toLocaleDateString('es-VE') +
-      ' ' +
-      ultimoResultado.fecha.toLocaleTimeString('es-VE'),
-      540,
-      720
-    );
+  for (let i = 0; i < 8; i++) {
+    const angle = Math.PI + (i * Math.PI / 7);
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+    dibujarEstrella(x, y, 20);
+  }
 
-    ctx.font = 'italic 36px Arial';
-    ctx.fillText('Gracias por usar BCVITO.IO', 540, 840);
+  /* ===============================
+     LOGO INLINE (TEXTO)
+  =============================== */
 
-    ctx.font = '28px Arial';
-    ctx.fillText('bcvito.io · Referencia informativa', 540, 900);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#FFFFFF';
 
-    // 5️⃣ Mostrar imagen en la pestaña
-    const dataURL = canvas.toDataURL('image/png');
+  ctx.font = 'bold 72px Arial';
+  ctx.fillText('BCVITO.IO', 540, 220);
 
-    nuevaVentana.document.write(`
-      <title>BCVITO.IO</title>
-      <style>
-        body {
-          margin: 0;
-          background: #000;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-        }
-        img {
-          max-width: 100%;
-          height: auto;
-        }
-      </style>
-      <img src="${dataURL}" alt="BCVITO.IO">
-    `);
+  ctx.font = '40px Arial';
+  ctx.fillText('Conversión USD → VES', 540, 290);
 
-    nuevaVentana.document.close();
-  };
+  /* ===============================
+     DATOS
+  =============================== */
+
+  ctx.font = '44px Arial';
+  ctx.fillText(`USD: $${ultimoResultado.usd}`, 540, 430);
+  ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa}`, 540, 500);
+
+  ctx.font = 'bold 70px Arial';
+  ctx.fillText(`TOTAL: Bs ${ultimoResultado.total}`, 540, 620);
+
+  ctx.font = '34px Arial';
+  ctx.fillText(
+    ultimoResultado.fecha.toLocaleDateString('es-VE') +
+    ' ' +
+    ultimoResultado.fecha.toLocaleTimeString('es-VE'),
+    540,
+    700
+  );
+
+  ctx.font = 'italic 36px Arial';
+  ctx.fillText('Gracias por usar BCVITO.IO', 540, 820);
+
+  ctx.font = '26px Arial';
+  ctx.fillText('Referencia informativa · bcvito.io', 540, 880);
+
+  /* ===============================
+     MOSTRAR IMAGEN
+  =============================== */
+
+  const dataURL = canvas.toDataURL('image/png');
+  const win = window.open();
+  win.document.write(`
+    <title>BCVITO.IO</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+    <img src="${dataURL}">
+  `);
 }
-
   </script>
 
   <div class="logo-fijo">
@@ -366,4 +404,5 @@ function generarImagen() {
 
 </body>
 </html>
+
 

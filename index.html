@@ -265,17 +265,24 @@ function generarImagen() {
     return;
   }
 
-  // Crear canvas
+  // 1️⃣ Abrir pestaña inmediatamente (clave)
+  const nuevaVentana = window.open('', '_blank');
+  if (!nuevaVentana) {
+    alert('El navegador bloqueó la ventana. Permite popups.');
+    return;
+  }
+
+  // 2️⃣ Crear canvas
   const canvas = document.createElement('canvas');
   canvas.width = 900;
   canvas.height = 500;
   const ctx = canvas.getContext('2d');
 
-  // Fondo oscuro
+  // Fondo
   ctx.fillStyle = '#0f0f0f';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Texto principal
+  // Texto
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'left';
 
@@ -297,29 +304,35 @@ function generarImagen() {
     290
   );
 
-  // Mensaje de agradecimiento
   ctx.font = 'italic 18px Arial';
   ctx.fillText('Gracias por usar BCVITO.IO', 40, 340);
 
-  // --- Cargar logo ---
-  const logo = new Image();
-  logo.src = 'logo-bcvito.png';
+  // 3️⃣ Convertir imagen
+  const dataURL = canvas.toDataURL('image/png');
 
-  logo.onload = () => {
-    // Dibujar logo (derecha)
-    ctx.drawImage(logo, canvas.width - 180, 40, 140, 140);
+  // 4️⃣ Escribir imagen en la pestaña
+  nuevaVentana.document.write(`
+    <title>BCVITO.IO</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+    <img src="${dataURL}" alt="BCVITO.IO">
+  `);
 
-    // Abrir imagen en nueva pestaña
-    const dataURL = canvas.toDataURL('image/png');
-    window.open(dataURL, '_blank');
-  };
-
-  logo.onerror = () => {
-    // Si el logo falla, igual mostrar imagen
-    const dataURL = canvas.toDataURL('image/png');
-    window.open(dataURL, '_blank');
-  };
+  nuevaVentana.document.close();
 }
+
   </script>
 
   <div class="logo-fijo">

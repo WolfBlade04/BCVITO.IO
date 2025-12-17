@@ -318,8 +318,8 @@ function generarImagen() {
     ctx.closePath();
     ctx.fill();
   }
-
-  ctx.fillStyle = '#FFFFFF';
+  
+ctx.fillStyle = 'rgba(255,255,255,0.35)';
 
   const centerX = 540;
   const centerY = 540;
@@ -343,7 +343,7 @@ function generarImagen() {
   ctx.fillText('BCVITO.IO', 540, 220);
 
   ctx.font = '40px Arial';
-  ctx.fillText('Conversión USD → VES', 540, 290);
+  ctx.fillText('Conversión USD - VES', 540, 290);
 
   /* ===============================
      DATOS
@@ -366,10 +366,10 @@ function generarImagen() {
   );
 
   ctx.font = 'italic 36px Arial';
-  ctx.fillText('Gracias por usar BCVITO.IO', 540, 820);
+  ctx.fillText('Muchas Gracias por usar BCVITO.IO', 540, 820);
 
   ctx.font = '26px Arial';
-  ctx.fillText('Referencia informativa · bcvito.io', 540, 880);
+  ctx.fillText('Referencia informativa · https://wolfblade04.github.io/BCVITO.IO', 540, 880);
 
   /* ===============================
      MOSTRAR IMAGEN
@@ -397,12 +397,17 @@ function generarImagen() {
   `);
 }
   </script>
-
+  
+<footer style="position:fixed;bottom:0;width:100%;text-align:center;padding:10px;font-size:13px;background:rgba(0,0,0,0.6);color:#ccc;">
+Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: <a href="mailto:boflowolf@gmail.com" style="color:#4fc3f7;text-decoration:none">boflowolf@gmail.com</a>
+</footer>
+  
   <div class="logo-fijo">
     <img src="logo-bcvito.png" alt="BCVito.io Logo">
   </div>
 
 </body>
 </html>
+
 
 

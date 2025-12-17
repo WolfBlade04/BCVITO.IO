@@ -259,76 +259,67 @@
     actualizarReloj();
     cargarTasaBCV();
 
-   function generarImagen() {
-grad.addColorStop(0.33, '#0033A0');
-grad.addColorStop(0.66, '#0033A0');
-grad.addColorStop(0.66, '#D52B1E');
-grad.addColorStop(1, '#D52B1E');
+function generarImagen() {
+  if (!ultimoResultado) {
+    alert('Primero realiza un cálculo');
+    return;
+  }
 
+  // Crear canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
+  canvas.height = 500;
+  const ctx = canvas.getContext('2d');
 
-ctx.fillStyle = grad;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Fondo oscuro
+  ctx.fillStyle = '#0f0f0f';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Texto principal
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
 
-// Overlay
-ctx.fillStyle = 'rgba(0,0,0,0.55)';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.font = 'bold 30px Arial';
+  ctx.fillText('Conversión USD → VES', 40, 60);
 
+  ctx.font = '22px Arial';
+  ctx.fillText(`USD: $${ultimoResultado.usd}`, 40, 140);
+  ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa}`, 40, 180);
 
-// Texto (se dibuja SIEMPRE)
-ctx.fillStyle = '#ffffff';
-ctx.textAlign = 'center';
+  ctx.font = 'bold 26px Arial';
+  ctx.fillText(`TOTAL: Bs ${ultimoResultado.total}`, 40, 240);
 
+  ctx.font = '16px Arial';
+  ctx.fillText(
+    ultimoResultado.fecha.toLocaleDateString('es-VE') + ' ' +
+    ultimoResultado.fecha.toLocaleTimeString('es-VE'),
+    40,
+    290
+  );
 
-ctx.font = 'bold 60px Arial';
-ctx.fillText('Conversión USD - VES', 540, 170);
+  // Mensaje de agradecimiento
+  ctx.font = 'italic 18px Arial';
+  ctx.fillText('Gracias por usar BCVITO.IO', 40, 340);
 
+  // --- Cargar logo ---
+  const logo = new Image();
+  logo.src = 'logo-bcvito.png';
 
-ctx.font = '48px Arial';
-ctx.fillText(`USD: $${ultimoResultado.usd}`, 540, 380);
-ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa}`, 540, 460);
+  logo.onload = () => {
+    // Dibujar logo (derecha)
+    ctx.drawImage(logo, canvas.width - 180, 40, 140, 140);
 
+    // Abrir imagen en nueva pestaña
+    const dataURL = canvas.toDataURL('image/png');
+    window.open(dataURL, '_blank');
+  };
 
-ctx.font = 'bold 70px Arial';
-ctx.fillText(`TOTAL: Bs ${ultimoResultado.total}`, 540, 600);
-
-
-ctx.font = '36px Arial';
-const fechaTxt = ultimoResultado.fecha.toLocaleDateString('es-VE') + ' ' + ultimoResultado.fecha.toLocaleTimeString('es-VE');
-ctx.fillText(fechaTxt, 540, 690);
-
-
-ctx.font = 'italic 40px Arial';
-ctx.fillText('Gracias por usar BCVITO.IO', 540, 820);
-
-
-ctx.font = '30px Arial';
-ctx.fillText('bcvito.io · Referencia informativa', 540, 880);
-
-
-// Logo local (no bloquea si falla)
-const logo = new Image();
-logo.src = './logo-bcvito.png';
-
-
-logo.onload = () => {
-ctx.drawImage(logo, 40, 40, 160, 160);
-descargar();
-};
-
-
-logo.onerror = () => {
-console.warn('No se pudo cargar logo-bcvito.png');
-descargar();
-
-
-const dataURL = canvas.toDataURL('image/png');
-window.open(dataURL, '_blank');
-
-};
-
-      }
-
+  logo.onerror = () => {
+    // Si el logo falla, igual mostrar imagen
+    const dataURL = canvas.toDataURL('image/png');
+    window.open(dataURL, '_blank');
+  };
+}
   </script>
 
   <div class="logo-fijo">

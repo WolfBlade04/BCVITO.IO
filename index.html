@@ -377,7 +377,7 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
 
   const dataURL = canvas.toDataURL('image/png');
   const win = window.open();
- win.document.write(
+ win.document.write(`
   <html>
   <head>
     <title> BCVITO.IO </title>
@@ -389,7 +389,7 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: 100vh;                              
       }
       img {
         max-width: 100%;
@@ -402,7 +402,7 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
     <img src="${img}">
   </body>
   </html>
-   );
+  `);
 
   </script>
   
@@ -413,9 +413,9 @@ Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: <a href="mailto:
   <div class="logo-fijo">
     <img src="logo-bcvito.png" alt="BCVito.io Logo">
   </div>
-
 </body>
 </html>
+
 
 
 

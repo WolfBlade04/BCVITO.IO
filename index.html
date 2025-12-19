@@ -136,6 +136,52 @@
     @media (max-width: 480px) {
       .logo-fijo { width: 70px; }
     }
+    .footer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.footer button {
+  background: #0033a0;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.footer button:hover {
+  background: #002060;
+}
+
+.acerca-de {
+  margin: 20px auto;
+  max-width: 600px;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 20px;
+  border-radius: 12px;
+  color: #fff;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.acerca-de h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.acerca-de .aviso {
+  font-size: 14px;
+  opacity: 0.85;
+  margin-top: 15px;
+}
+
+.oculto {
+  display: none;
+}
+
+    
   </style>
 </head>
 <body>
@@ -408,6 +454,11 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
     </html>
   `);
   }
+    document.getElementById('btnAcercaDe').addEventListener('click', () => {
+  const contenido = document.getElementById('acercaDeContenido');
+  contenido.classList.toggle('oculto');
+});
+
   </script>
 </body>
 
@@ -417,9 +468,40 @@ ctx.fillStyle = 'rgba(255,255,255,0.35)';
 
 <footer style="position:fixed;bottom:0;width:100%;text-align:center;padding:10px;font-size:13px;background:rgba(0,0,0,0.6);color:#ccc;">
 Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: <a href="mailto:boflowolf@gmail.com" style="color:#4fc3f7;text-decoration:none">boflowolf@gmail.com</a>
+   <footer class="footer">
+  <button id="btnAcercaDe">Acerca de</button>
+
+  <div id="acercaDeContenido" class="acerca-de oculto">
+    <h3>Acerca de BCVITO.IO</h3>
+
+    <p>
+      <strong>BCVITO.IO</strong> Es una herramienta web creada con el propósito de
+      facilitar la conversión de Dólares Estadounidenses (USD) a Bolívares
+      Venezolanos (VES), utilizando como referencia la tasa oficial publicada
+      por el Banco Central de Venezuela (BCV).
+    </p>
+
+    <p>
+      Esta plataforma fue desarrollada como un proyecto independiente,
+      enfocada en brindar una experiencia rápida, sencilla y clara para
+      usuarios que necesitan realizar conversiones de forma frecuente.
+    </p>
+
+    <p>
+      BCVITO.IO no está afiliada al Banco Central de Venezuela ni a ninguna
+      entidad gubernamental. Los valores mostrados tienen carácter
+      <strong>referencial</strong> y pueden variar con el tiempo.
+    </p>
+
+    <p class="aviso">
+      ⚠️ Aviso: BCVITO.IO no se hace responsable por decisiones financieras
+      tomadas con base en la información presentada.
+    </p>
+  </div>
 </footer>
   
   </html>
+
 
 
 

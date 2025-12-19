@@ -264,32 +264,36 @@ function generarImagen(){
     alert('Primero realiza un cálculo');
     return;
   }
-
+       
   const canvas = document.createElement('canvas');
   canvas.width = 1080;
   canvas.height = 1920;
   const ctx = canvas.getContext('2d');
-
+   @@ -273,20 +273,21 @@ <h1>Calculadora USD a VES (BCV)<h1>
+     
   /* ===============================
      FONDO BANDERA DE VENEZUELA
   =============================== */
+const H = canvas.height;
 
-  // Amarillo
-  ctx.fillStyle = '#F4D03F';
-  ctx.fillRect(0, 0, 1080, 360);
+// Amarillo
+ctx.fillStyle = '#F4D03F';
+ctx.fillRect(0, 0, 1080, H / 3);
 
-  // Azul
-  ctx.fillStyle = '#0033A0';
-  ctx.fillRect(0, 360, 1080, 360);
+// Azul
+ctx.fillStyle = '#0033A0';
+ctx.fillRect(0, H / 3, 1080, H / 3);
 
-  // Rojo
-  ctx.fillStyle = '#D52B1E';
-  ctx.fillRect(0, 720, 1080, 360);
-
-  // Overlay oscuro para legibilidad
+// Rojo
+ctx.fillStyle = '#D52B1E';
+ctx.fillRect(0, (H / 3) * 2, 1080, H / 3);
+  
+   // Overlay oscuro para legibilidad
   ctx.fillStyle = 'rgba(0,0,0,0.55)';
   ctx.fillRect(0, 0, 1080, 1920);
 
+     @@ -273,20 +273,21 @@ <h1>Calculadora USD a VES (BCV)</h1>
+  
   /* ===============================
      ESTRELLAS (8 en arco)
   =============================== */
@@ -322,7 +326,7 @@ function generarImagen(){
 ctx.fillStyle = 'rgba(255,255,255,0.35)';
 
   const centerX = 540;
-  const centerY = 540;
+  const centerY = 640;
   const radius = 180;
 
   for (let i = 0; i < 8; i++) {
@@ -416,6 +420,7 @@ Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: <a href="mailto:
 </footer>
   
   </html>
+
 
 
 

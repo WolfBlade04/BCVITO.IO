@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BCVito.io|Conversión USD-VES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Meta tags para PWA -->
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="BCVito.io">
+  <meta name="description" content="Calculadora de conversión USD a VES con tasa BCV oficial">
+  <meta name="keywords" content="BCV, dólar, bolívar, conversión, tasa, Venezuela">
+  <meta name="author" content="Fabián Fariñas">
+  
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Iconos para diferentes dispositivos -->
+  <link rel="icon" type="image/png" href="favicon2.png">
+  <link rel="apple-touch-icon" href="icon-192x192.png">
+  
+  <!-- Para Windows -->
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="msapplication-TileImage" content="icon-144x144.png">
+
+  <style>
+    /* Botón para instalar PWA - Agrega esto en tu CSS */
+    #installButton {
+      position: fixed;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      display: none;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    
+    #installButton:hover {
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    @media (max-width: 768px) {
+      #installButton {
+        bottom: 110px;
+        padding: 10px 20px;
+        font-size: 13px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #installButton {
+        bottom: 100px;
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+    }
+
+    :root {
+      --bg-overlay: rgba(0,0,0,0.7);
+      --card-color: #4e4e4ea9;
+      --text-color: #ffffff;
+      --input-bg: #2a2a2a;
+      --border-color: #444;
+      --button-color: #202020;
+      --button-active: #3a3a3a;
+      --up: #4caf50;
+      --down: #f44336;
+      --warn: #ff9800;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-color);
+      background:
+        linear-gradient(var(--bg-overlay), var(--bg-overlay)),
+        url('https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg');
+      background-size: cover;
+      background-position: center;
+      padding: 20px 15px;
+      padding-bottom: 80px; /* Espacio para el footer */
+      box-sizing: border-box;
+    }
+
+    .card {
+      background: var(--card-color);
+      padding: 20px 25px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      margin: 20px 0;
+    }
+
+    h1 { text-align: center; font-size: 20px; margin-bottom: 15px; }
+    label { margin-top: 15px; display: block; font-weight: bold; }
+
+    /* Selector de conversión */
+    .conversion-selector {
+      display: flex;
+      background: var(--input-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 15px 0;
+      border: 1px solid var(--border-color);
+    }
+    
+    .conversion-btn {
+      flex: 1;
+      padding: 12px 5px;
+      background: transparent;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .conversion-btn.active {
+      background: var(--button-active);
+      color: white;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    }
+    
+    .conversion-btn:first-child {
+      border-right: 1px solid var(--border-color);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 50px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: var(--button-color);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    button:hover {
+      background: #303030;
+    }
+
+    .resultado {
+      margin-top: 15px;
+      font-size: 20px;
+      text-align: center;
+      font-weight: bold;
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ultima-tasa {
+      margin-top: 15px;
+      font-size: 13px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      text-align: center;
+    }
+
+    .flecha.subio { color: var(--up); }
+    .flecha.bajo { color: var(--down); }
+
+    .reloj {
+      position: fixed;
+      top: 12px;
+      right: 15px;
+      font-size: 14px;
+      text-align: right;
+      z-index: 100;
+    }
+
+    .offline {
+      position: fixed;
+      bottom: 90px; /* Encima del footer */
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--warn);
+      color: #000;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: none;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    /* Botón Acerca de - ESQUINA SUPERIOR IZQUIERDA */
+    .acerca-btn {
+      position: fixed;
+      top: 12px;
+      left: 15px;
+      z-index: 100;
+    }
+
+    .acerca-btn button {
+      background: rgba(35, 35, 36, 0.77);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      width: auto;
+      margin: 0;
+    }
+
+    .acerca-btn button:hover {
+      background: rgba(60, 60, 61, 0.9);
+      transform: translateY(-1px);
+    }
+
+    /* -------- RESPONSIVE -------- */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px 10px;
+        padding-bottom: 70px;
+        justify-content: flex-start;
+        min-height: 100vh;
+      }
+      
+      .card {
+        margin-top: 60px; /* Espacio para botón superior */
+        padding: 18px;
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .reloj { 
+        font-size: 12px; 
+        top: 8px; 
+        right: 10px; 
+        max-width: 50%;
+        line-height: 1.2;
+      }
+      
+      .acerca-btn {
+        top: 8px;
+        left: 10px;
+      }
+      
+      .acerca-btn button {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+      }
+      
+      input {
+        padding: 12px;
+        font-size: 16px;
+      }
+      
+      button {
+        padding: 14px;
+        font-size: 16px;
+      }
+      
+      .conversion-btn {
+        padding: 10px 5px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px 8px;
+        padding-bottom: 60px;
+      }
+      
+      h1 { font-size: 18px; }
+      
+      .card {
+        padding: 15px;
+        margin-top: 50px;
+      }
+      
+      .reloj {
+        font-size: 11px;
+        top: 6px;
+        right: 8px;
+      }
+      
+      .acerca-btn button {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      
+      .offline {
+        bottom: 70px;
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+      
+      .conversion-btn {
+        padding: 8px 4px;
+        font-size: 12px;
+      }
+    }
+
+    .logo-fijo {
+      position: fixed;
+      bottom: 70px; /* Encima del footer */
+      right: 12px;
+      width: 90px;
+      opacity: 0.9;
+      z-index: 999;
+    }
+
+    .logo-fijo img {
+      width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 768px) {
+      .logo-fijo {
+        width: 70px;
+        bottom: 65px;
+        right: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-fijo { 
+        width: 60px; 
+        bottom: 60px;
+        right: 8px;
+      }
+    }
+
+    /* Modal Acerca de - CORREGIDO */
+    #modalAcercaDe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+      display: none;
+    }
+
+    #modalAcercaDe.visible {
+      display: flex;
+    }
+
+    .modal-contenido {
+      background: #1e1e1e;
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-contenido h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    /* Botón Cerrar */
+    .cerrar {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 26px;
+      cursor: pointer;
+      color: white;
+      background: none;
+      border: none;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cerrar:hover {
+      color: #ff4d4d;
+    }
+
+    /* Aviso */
+    .aviso {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-top: 15px;
+    }
+
+    /* FOOTER MEJORADO */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.377);
+      color: #ccc;
+      font-size: 13px;
+      padding: 10px 15px;
+      text-align: center;
+      z-index: 99;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    footer a {
+      color: #4fc3f7;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .modal-contenido {
+        padding: 20px;
+        max-height: 70vh;
+        font-size: 14px;
+      }
+      
+      .modal-contenido h2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      
+      footer {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      footer {
+        font-size: 11px;
+        padding: 6px 8px;
+        line-height: 1.4;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reloj en esquina superior derecha -->
+  <div class="reloj" id="reloj"></div>
+  
+  <!-- Botón Acerca de en esquina superior izquierda -->
+  <div class="acerca-btn">
+    <button id="btnAbrirModal">Acerca de</button>
+  </div>
+
+  <!-- Mensaje sin conexión -->
+  <div class="offline" id="offlineMsg">⚠️ Sin conexión a Internet</div>
+  
+  <!-- Botón para instalar PWA -->
+  <button id="installButton" style="display: none;">📲 Instalar App</button>
+
+  <!-- Card principal -->
+  <div class="card">
+    <h1>Calculadora USD ↔ VES (BCV)</h1>
+    
+    <!-- Selector de tipo de conversión -->
+    <div class="conversion-selector">
+      <button class="conversion-btn active" id="usdToBsBtn">USD → Bs</button>
+      <button class="conversion-btn" id="bsToUsdBtn">Bs → USD</button>
+    </div>
+
+    <!-- Campo de monto dinámico -->
+    <label id="montoLabel">Monto (USD)</label>
+    <input type="number" id="monto" step="0.01" placeholder="Ejemplo: 1$">
+
+    <label>Tasa Del Día (Bs)</label>
+    <input type="number" id="tasa" step="0.01" readonly>
+
+    <button onclick="calcular()">Calcular</button>
+    <button onclick="cargarTasaBCV()">Actualizar Tasa</button>
+    <button onclick="generarImagen()">Descargar Imagen</button>
+
+    <div class="resultado" id="resultado"></div>
+    <div class="ultima-tasa" id="ultimaTasa"></div>
+  </div>
+
+  <!-- Modal Acerca de -->
+  <div id="modalAcercaDe">
+    <div class="modal-contenido">
+      <button id="cerrarModal" class="cerrar" aria-label="Cerrar">&times;</button>
+
+      <h2>Acerca de BCVITO.IO</h2>
+
+      <p>
+        <strong>BCVITO.IO</strong> es una herramienta web creada para facilitar la
+        conversión de dólares estadounidenses (USD) a bolívares venezolanos (VES),
+        utilizando como referencia la tasa oficial del Banco Central de Venezuela (BCV).
+      
+        Este proyecto fue desarrollado de forma independiente con el objetivo de
+        ofrecer una experiencia rápida, clara y accesible desde cualquier dispositivo.
+
+        BCVITO.IO no está afiliada al Banco Central de Venezuela ni a ninguna entidad
+        gubernamental. Los valores mostrados son de carácter informativo.
+      </p>
+
+      <p class="aviso">
+        ⚠️ BCVITO.IO no se hace responsable por decisiones financieras tomadas con base
+        en la información presentada.
+      </p>
+      
+      <p style="margin-top: 20px; font-size: 12px; color: #ccc;">
+        💡 <strong>Consejo:</strong> Puedes instalar esta aplicación en tu dispositivo móvil
+        para acceder rápidamente sin necesidad de navegador. Busca la opción "Agregar a pantalla de inicio"
+        o "Instalar aplicación" en tu navegador.
+      </p>
+    </div>
+  </div>
+
+  <!-- Logo -->
+  <div class="logo-fijo">
+    <img src="logo-bcvito.png" alt="BCVito.io Logo">
+  </div>
+
+  <!-- Footer Mejorado -->
+  <footer>
+    Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: 
+    <a href="mailto:boflowolf@gmail.com">boflowolf@gmail.com</a>
+  </footer>
+
+  <script>
+    // Variables globales
+    let conversionActual = 'usd-to-bs'; // 'usd-to-bs' o 'bs-to-usd'
+    let ultimoResultado = null;
+    let devtoolsOpen = false;
+    let deferredPrompt; // Para PWA
+
+    // Protección básica
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+        (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+        (e.ctrlKey && e.key === 'U')
+      ) {
+        e.preventDefault();
+        alert('Acceso restringido en BCVITO.IO');
+      }
+    });
+
+    // Detección de DevTools
+    const devtoolsDetection = /./;
+    devtoolsDetection.toString = function() {
+      devtoolsOpen = true;
+      return '';
+    };
+
+    setInterval(() => {
+      if(devtoolsOpen) {
+        console.log('%c⚠️ Acceso restringido - BCVITO.IO', 'color: red; font-size: 20px;');
+        console.log('%cEsta herramienta está protegida contra inspección.', 'color: orange;');
+        devtoolsOpen = false;
+      }
+    }, 5000);
+
+    const API_URLS = [
+      'https://ve.dolarapi.com/v1/dolares/oficial',
+      'https://api.exchangerate.host/latest?base=USD&symbols=VES'
+    ];
+
+    /* ---------- CONEXIÓN ---------- */
+    function actualizarConexion() {
+      const msg = document.getElementById('offlineMsg');
+      msg.style.display = navigator.onLine ? 'none' : 'block';
+    }
+
+    window.addEventListener('online', actualizarConexion);
+    window.addEventListener('offline', actualizarConexion);
+    actualizarConexion();
+
+    /* ---------- SELECTOR DE CONVERSIÓN ---------- */
+    function cambiarConversion(tipo) {
+      conversionActual = tipo;
+      
+      // Actualizar botones
+      document.getElementById('usdToBsBtn').classList.remove('active');
+      document.getElementById('bsToUsdBtn').classList.remove('active');
+      document.getElementById(tipo === 'usd-to-bs' ? 'usdToBsBtn' : 'bsToUsdBtn').classList.add('active');
+      
+      // Actualizar etiquetas y placeholders
+      const montoInput = document.getElementById('monto');
+      const label = document.getElementById('montoLabel');
+      
+      if (tipo === 'usd-to-bs') {
+        label.textContent = 'Monto (USD)';
+        montoInput.placeholder = 'Ejemplo: 1$';
+        montoInput.value = ''; // Limpiar campo
+      } else {
+        label.textContent = 'Monto (Bs)';
+        montoInput.placeholder = 'Ejemplo: 100.000 Bs';
+        montoInput.value = ''; // Limpiar campo
+      }
+      
+      // Limpiar resultado anterior
+      document.getElementById('resultado').textContent = '';
+    }
+
+    // Event listeners para botones de conversión
+    document.getElementById('usdToBsBtn').addEventListener('click', function() {
+      cambiarConversion('usd-to-bs');
+    });
+    
+    document.getElementById('bsToUsdBtn').addEventListener('click', function() {
+      cambiarConversion('bs-to-usd');
+    });
+
+    /* ---------- PWA: Instalación ---------- */
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevenir que el navegador muestre el prompt automático
+      e.preventDefault();
+      // Guardar el evento para usarlo después
+      deferredPrompt = e;
+      
+      // Mostrar botón de instalación
+      const installButton = document.getElementById('installButton');
+      installButton.style.display = 'block';
+      
+      // Cuando el usuario haga clic en el botón
+      installButton.addEventListener('click', async () => {
+        // Mostrar el prompt de instalación
+        deferredPrompt.prompt();
+        
+        // Esperar a que el usuario responda al prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+          console.log('Usuario aceptó instalar la PWA');
+          installButton.style.display = 'none';
+        } else {
+          console.log('Usuario rechazó instalar la PWA');
+        }
+        
+        // Limpiar el deferredPrompt
+        deferredPrompt = null;
+      });
+    });
+
+    // Ocultar botón de instalación si la app ya está instalada
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA instalada');
+      document.getElementById('installButton').style.display = 'none';
+      deferredPrompt = null;
+      
+      // Mostrar mensaje de confirmación
+      alert('¡BCVito.io ha sido instalada correctamente! 🎉\n\nAhora puedes acceder a ella directamente desde tu pantalla de inicio.');
+    });
+
+    // Verificar si ya está instalada
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log('App ya está instalada');
+      document.getElementById('installButton').style.display = 'none';
+    }
+
+    /* ---------- SERVICE WORKER ---------- */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // Ajusta la ruta según tu estructura en GitHub Pages
+        // Si tu repositorio se llama "BCVITO.IO", la ruta sería '/BCVITO.IO/service-worker.js'
+        navigator.serviceWorker.register('service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registrado con éxito:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Error al registrar ServiceWorker:', error);
+          });
+      });
+    }
+
+    /* ---------- BCV ---------- */
+    async function cargarTasaBCV() {
+      if (!navigator.onLine) {
+        habilitarEntradaManual();
+        return;
+      }
+
+      let nuevaTasa = null;
+
+      for (const url of API_URLS) {
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data.promedio) nuevaTasa = Number(data.promedio);
+          else if (data.venta) nuevaTasa = Number(data.venta);
+          else if (data.precio) nuevaTasa = Number(data.precio);
+          else if (data.rates && data.rates.VES) nuevaTasa = Number(data.rates.VES);
+
+          if (!isNaN(nuevaTasa)) break;
+        } catch (e) {}
+      }
+
+      if (!nuevaTasa || isNaN(nuevaTasa)) {
+        habilitarEntradaManual();
+        document.getElementById('ultimaTasa').textContent = 'No se pudo obtener la tasa automáticamente. Ingrésela manualmente.';
+        return;
+      }
+
+      const tasaAnterior = Number(localStorage.getItem('ultimaTasa'));
+      const ahora = new Date();
+
+      const tasaInput = document.getElementById('tasa');
+      tasaInput.value = nuevaTasa.toFixed(2);
+      tasaInput.readOnly = true;
+
+      localStorage.setItem('ultimaTasa', nuevaTasa);
+      localStorage.setItem('fechaTasa', ahora.toISOString());
+
+      mostrarUltimaTasa(nuevaTasa, ahora, tasaAnterior);
+    }
+
+    function habilitarEntradaManual() {
+      const tasaInput = document.getElementById('tasa');
+      tasaInput.readOnly = false;
+      tasaInput.placeholder = 'Ingrese la tasa manualmente';
+    }
+
+    /* ---------- CÁLCULO ---------- */
+    function calcular() {
+      const monto = Number(document.getElementById('monto').value);
+      const tasa = Number(document.getElementById('tasa').value);
+      
+      if (!monto || !tasa) {
+        alert('Por favor ingrese un monto y una tasa válida');
+        return;
+      }
+      
+      let resultadoTexto = '';
+      
+      if (conversionActual === 'usd-to-bs') {
+        // USD → Bs
+        const totalBs = (monto * tasa);
+        resultadoTexto = `Bs ${formatearNumero(totalBs)}`;
+        ultimoResultado = { 
+          tipo: 'USD → Bs',
+          origen: `${formatearNumero(monto)} USD`, 
+          destino: `${formatearNumero(totalBs)} Bs`,
+          tasa: tasa,
+          fecha: new Date(),
+          montoOriginal: monto,
+          resultado: totalBs
+        };
+      } else {
+        // Bs → USD
+        const totalUsd = (monto / tasa);
+        resultadoTexto = `$ ${formatearNumero(totalUsd)} USD`;
+        ultimoResultado = { 
+          tipo: 'Bs → USD',
+          origen: `${formatearNumero(monto)} Bs`, 
+          destino: `${formatearNumero(totalUsd)} USD`,
+          tasa: tasa,
+          fecha: new Date(),
+          montoOriginal: monto,
+          resultado: totalUsd
+        };
+      }
+      
+      document.getElementById('resultado').textContent = resultadoTexto;
+    }
+
+    function formatearNumero(num) {
+      return num.toLocaleString('es-VE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function mostrarUltimaTasa(tasa, fecha, tasaAnterior) {
+      let flecha = '';
+      if (tasaAnterior) {
+        if (tasa > tasaAnterior) flecha = '<span class="flecha subio"> ▲ Subió</span>';
+        if (tasa < tasaAnterior) flecha = '<span class="flecha bajo"> ▼ Bajó</span>';
+      }
+
+      document.getElementById('ultimaTasa').innerHTML =
+        `Tasa BCV: <strong>Bs ${formatearNumero(tasa)}</strong>${flecha}<br>` +
+        `<small>${fecha.toLocaleDateString('es-VE')} ${fecha.toLocaleTimeString('es-VE')}</small>`;
+    }
+
+    /* ---------- RELOJ ---------- */
+    function actualizarReloj() {
+      const a = new Date();
+      document.getElementById('reloj').innerHTML =
+        `${a.toLocaleDateString('es-VE', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}<br>` +
+        a.toLocaleTimeString('es-VE');
+    }
+
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj();
+    cargarTasaBCV();
+
+    /* ---------- GENERAR IMAGEN ---------- */
+    function generarImagen() {
+      if (!ultimoResultado) {
+        alert('Primero realiza un cálculo');
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1920;
+      const ctx = canvas.getContext('2d');
+
+      /* FONDO BANDERA */
+      const H = canvas.height;
+
+      // Amarillo
+      ctx.fillStyle = '#F4D03F';
+      ctx.fillRect(0, 0, 1080, H / 3);
+
+      // Azul
+      ctx.fillStyle = '#0033A0';
+      ctx.fillRect(0, H / 3, 1080, H / 3);
+
+      // Rojo
+      ctx.fillStyle = '#D52B1E';
+      ctx.fillRect(0, (H / 3) * 2, 1080, H / 3);
+
+      // Overlay oscuro
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      /* ESTRELLAS (8 en arco) */
+      function dibujarEstrella(cx, cy, r, spikes = 5) {
+        let rot = Math.PI / 2 * 3;
+        let x = cx;
+        let y = cy;
+        const step = Math.PI / spikes;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - r);
+
+        for (let i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * r;
+          y = cy + Math.sin(rot) * r;
+          ctx.lineTo(x, y);
+          rot += step;
+
+          x = cx + Math.cos(rot) * (r / 2);
+          y = cy + Math.sin(rot) * (r / 2);
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+
+        ctx.lineTo(cx, cy - r);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      const centerX = 540;
+      const centerY = 1040;
+      const radius = 250;
+
+      for (let i = 0; i < 8; i++) {
+        const angle = Math.PI + (i * Math.PI / 7);
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        dibujarEstrella(x, y, 20);
+      }
+
+      /* TEXTO */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#FFFFFF';
+
+      ctx.font = 'bold 72px Arial';
+      ctx.fillText('BCVITO.IO', 540, 220);
+
+      ctx.font = '40px Arial';
+      ctx.fillText('Conversión ' + ultimoResultado.tipo, 540, 290);
+
+      ctx.font = '44px Arial';
+      ctx.fillText(`${ultimoResultado.origen}`, 540, 430);
+      ctx.fillText(`Tasa: Bs ${ultimoResultado.tasa.toFixed(2)}`, 540, 500);
+
+      ctx.font = 'bold 70px Arial';
+      ctx.fillText(`TOTAL: ${ultimoResultado.destino}`, 540, 620);
+
+      ctx.font = '34px Arial';
+      ctx.fillText(
+        ultimoResultado.fecha.toLocaleDateString('es-VE') +
+        ' ' +
+        ultimoResultado.fecha.toLocaleTimeString('es-VE'),
+        540,
+        700
+      );
+
+      ctx.font = 'italic 36px Arial';
+      ctx.fillText('Muchas Gracias por usar BCVITO.IO', 540, 820);
+
+      ctx.font = '26px Arial';
+      ctx.fillText('Referencia informativa · https://wolfblade04.github.io/BCVITO.IO', 540, 880);
+
+      /* MOSTRAR IMAGEN */
+      const dataURL = canvas.toDataURL('image/png');
+      const win = window.open();
+      win.document.write(`
+        <html>
+        <head>
+          <title> BCVITO.IO </title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              margin: 0;
+              background: #000;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+            }
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${dataURL}">
+        </body>
+        </html>
+      `);
+    }
+
+    /* ---------- MODAL CORREGIDO ---------- */
+    document.addEventListener('DOMContentLoaded', function() {
+      const btnAbrirModal = document.getElementById('btnAbrirModal');
+      const modal = document.getElementById('modalAcercaDe');
+      const cerrarModal = document.getElementById('cerrarModal');
+      
+      if (!btnAbrirModal || !modal || !cerrarModal) {
+        console.error('No se encontraron los elementos del modal');
+        return;
+      }
+      
+      modal.style.display = 'none';
+      
+      function abrirModal() {
+        modal.style.display = 'flex';
+        setTimeout(() => {
+          modal.classList.add('visible');
+        }, 10);
+      }
+      
+      function cerrarModalFunc() {
+        modal.classList.remove('visible');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+      
+      btnAbrirModal.addEventListener('click', abrirModal);
+      cerrarModal.addEventListener('click', cerrarModalFunc);
+      
+      modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          cerrarModalFunc();
+        }
+      });
+      
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'flex') {
+          cerrarModalFunc();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

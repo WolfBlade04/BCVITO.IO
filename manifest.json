@@ -1,0 +1,27 @@
+{
+  "name": "BCVito.io | Conversión USD-VES",
+  "short_name": "BCVito.io",
+  "description": "Calculadora de conversión USD a VES con tasa BCV oficial",
+  "start_url": "/BCVITO.IO/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "lang": "es-VE",
+  "dir": "ltr"
+}

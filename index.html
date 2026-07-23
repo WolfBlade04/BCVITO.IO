@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>BCVito.io | USD-EUR-VES Converter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="theme-color" content="#0a0a0a" id="metaThemeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BCVito.io">
+  <meta name="description" content="USD and EUR to VES converter with official BCV exchange rates">
+  <meta name="keywords" content="BCV, dollar, euro, bolivar, conversion, rate, Venezuela">
+  <meta name="author" content="Fabián Fariñas">
+  
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="icon" type="image/png" href="favicon2.png">
+  <link rel="apple-touch-icon" href="icon-192x192.png">
+  
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="msapplication-TileImage" content="icon-144x144.png">
+
+  <style>
+    /* Variables para Tema Oscuro (Por defecto) */
+    :root[data-theme="dark"] {
+      --bg-overlay: rgba(10, 10, 10, 0.75);
+      --card-color: rgba(30, 30, 32, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-color: #ffffff;
+      --text-muted: #b3b3b3;
+      --input-bg: rgba(20, 20, 20, 0.6);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --button-color: rgba(255, 255, 255, 0.08);
+      --button-active: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --hover-color: rgba(255, 255, 255, 0.15);
+      --glass-blur: blur(16px);
+      --resultado-bg: rgba(0, 0, 0, 0.2);
+      --selector-bg: rgba(0, 0, 0, 0.25);
+      --modal-bg: rgba(20, 20, 22, 0.85);
+      --topbar-bg: rgba(10, 10, 10, 0.2);
+      --footer-bg: rgba(10, 10, 10, 0.4);
+    }
+
+    /* Variables para Tema Claro */
+    :root[data-theme="light"] {
+      --bg-overlay: rgba(240, 242, 245, 0.65);
+      --card-color: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-color: #1a1a1a;
+      --text-muted: #666666;
+      --input-bg: rgba(245, 247, 250, 0.9);
+      --border-color: rgba(0, 0, 0, 0.1);
+      --button-color: rgba(0, 0, 0, 0.04);
+      --button-active: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --hover-color: rgba(0, 0, 0, 0.08);
+      --glass-blur: blur(16px);
+      --resultado-bg: rgba(0, 0, 0, 0.03);
+      --selector-bg: rgba(0, 0, 0, 0.05);
+      --modal-bg: rgba(255, 255, 255, 0.9);
+      --topbar-bg: rgba(255, 255, 255, 0.5);
+      --footer-bg: rgba(255, 255, 255, 0.6);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-color);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      padding: 20px 15px;
+      padding-bottom: 80px;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-image 0.5s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      button, .conversion-btn, .chip-btn, .acerca-btn button, .idioma-btn button, .theme-toggle, .sound-toggle {
+        touch-action: manipulation;
+      }
+      button:active, .conversion-btn:active, .chip-btn:active, .acerca-btn button:active, 
+      .idioma-btn button:active, .theme-toggle:active, .sound-toggle:active {
+        transform: scale(0.96) !important;
+        transition: transform 0.1s ease;
+      }
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      box-sizing: border-box;
+      z-index: 100;
+      background: var(--topbar-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+
+    .top-left-controls {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .card {
+      background: var(--card-color);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      padding: 25px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 390px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      border: 1px solid var(--card-border);
+      margin-top: 60px;
+      box-sizing: border-box;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+
+    h1 { 
+      text-align: center; 
+      font-size: 20px; 
+      margin: 0 0 15px 0;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    label { 
+      margin-top: 15px; 
+      display: block; 
+      font-weight: 600; 
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .conversion-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      background: var(--selector-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 15px 0;
+      padding: 4px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .conversion-btn {
+      padding: 8px 4px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .conversion-btn.active {
+      background: var(--button-active);
+      color: white;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .chips-container {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip-btn {
+      background: var(--button-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 30px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chip-btn:hover {
+      background: var(--hover-color);
+      border-color: var(--border-color);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    button.main-action {
+      width: 100%;
+      padding: 12px;
+      background: var(--button-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    button.main-action:hover {
+      background: var(--hover-color);
+    }
+
+    .resultado {
+      margin-top: 20px;
+      font-size: 26px;
+      text-align: center;
+      font-weight: 700;
+      padding: 15px;
+      background: var(--resultado-bg);
+      border-radius: 12px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+    
+    .btn-copiar {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 6px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-copiar:hover {
+      color: var(--text-color);
+      transform: scale(1.1);
+    }
+    
+    .toast-copiado {
+      position: absolute;
+      background: #2ecc71;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      top: -15px;
+      right: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(5px);
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    .toast-copiado.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .resultado.animado {
+      animation: resultado-animacion 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @keyframes resultado-animacion {
+      0% { transform: scale(0.96); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .ultima-tasa {
+      margin-top: 15px;
+      font-size: 13px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      text-align: center;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .trend-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .trend-up {
+      background: rgba(231, 76, 60, 0.15);
+      color: #e74c3c;
+    }
+    .trend-down {
+      background: rgba(46, 204, 113, 0.15);
+      color: #2ecc71;
+    }
+    .trend-flat {
+      background: rgba(149, 165, 166, 0.15);
+      color: var(--text-muted);
+    }
+
+    .reloj {
+      font-size: 12px;
+      text-align: right;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .offline {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f39c12;
+      color: #000;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      display: none;
+      font-weight: 700;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .acerca-btn button, .idioma-btn button, .theme-toggle {
+      background: var(--button-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .acerca-btn button:hover, .idioma-btn button:hover, .theme-toggle:hover {
+      background: var(--hover-color);
+    }
+    
+    .idioma-btn button.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    #installButton {
+      position: fixed;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--button-active);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      display: none;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.03); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    
+    .sound-toggle {
+      position: fixed;
+      bottom: 55px;
+      left: 15px;
+      background: var(--card-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .sound-toggle:hover {
+      background: var(--hover-color);
+      transform: scale(1.05);
+    }
+    
+    .sound-toggle.muted { opacity: 0.4; }
+    .sound-toggle.muted::after {
+      content: "✗";
+      position: absolute;
+      color: #e74c3c;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .logo-fijo {
+      position: fixed;
+      bottom: 70px;
+      right: 15px;
+      width: 75px;
+      opacity: 0.85;
+      z-index: 999;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .logo-fijo:hover {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    .logo-fijo img { width: 100%; height: auto; }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal-contenido {
+      background: var(--modal-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      color: var(--text-color);
+      padding: 25px;
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .cerrar {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 26px;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      transition: color 0.2s ease;
+    }
+    .cerrar:hover { color: #ff4d4d; }
+
+    .guia-item {
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .guia-item strong { color: #667eea; }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--footer-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 12px 15px;
+      text-align: center;
+      z-index: 99;
+      box-sizing: border-box;
+      border-top: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    footer a { color: #4fc3f7; text-decoration: none; font-weight: 500; }
+
+    @media (max-width: 768px) {
+      .card { margin-top: 80px; }
+      .reloj { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="top-left-controls">
+      <div class="acerca-btn">
+        <button id="btnAyuda">❓ Guía</button>
+      </div>
+      <div class="acerca-btn">
+        <button id="btnAbrirModal">Acerca de</button>
+      </div>
+      <div class="idioma-btn">
+        <button id="btnIdioma" title="Change language">EN</button>
+      </div>
+      <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
+    </div>
+    <div class="reloj" id="reloj">Cargando...</div>
+  </div>
+
+  <div class="offline" id="offlineMsg">⚠️ Sin conexión a Internet</div>
+  
+  <button id="installButton">📲 Instalar App</button>
+
+  <div class="card">
+    <h1 id="tituloPrincipal">Calculadora USD / EUR ↔ VES</h1>
+    
+    <div class="conversion-selector">
+      <button class="conversion-btn active" id="usdToBsBtn">USD → Bs</button>
+      <button class="conversion-btn" id="bsToUsdBtn">Bs → USD</button>
+      <button class="conversion-btn" id="eurToBsBtn">EUR → Bs</button>
+      <button class="conversion-btn" id="bsToEurBtn">Bs → EUR</button>
+    </div>
+
+    <label id="montoLabel">Monto (USD)</label>
+    <input type="number" id="monto" step="0.01" placeholder="Ejemplo: 1$" inputmode="decimal">
+    
+    <div class="chips-container" id="chipsContainer"></div>
+
+    <label id="tasaLabel">Tasa Del Día (Bs)</label>
+    <input type="number" id="tasa" step="0.01" readonly>
+
+    <div class="action-buttons">
+      <button class="main-action" id="btnActualizar">Actualizar Tasas</button>
+      <button class="main-action" id="btnDescargar">Compartir Conversión</button>
+    </div>
+
+    <div class="resultado" id="resultado">
+      <span id="resultadoTexto"></span>
+      <button id="btnCopiar" class="btn-copiar" title="Copiar monto">📋</button>
+      <div id="toastCopiado" class="toast-copiado">¡Copiado!</div>
+    </div>
+    
+    <div class="ultima-tasa" id="ultimaTasa"></div>
+  </div>
+
+  <!-- Modal de Guía de Uso -->
+  <div class="modal-overlay" id="modalGuia">
+    <div class="modal-contenido">
+      <button id="cerrarModalGuia" class="cerrar" aria-label="Cerrar">&times;</button>
+      <h2 id="guiaTitulo">Guía de Uso de BCVito.io</h2>
+      <div class="guia-item"><strong>USD → Bs / EUR → Bs:</strong> Convierte divisas extranjeras a bolívares multiplicando por la tasa oficial.</div>
+      <div class="guia-item"><strong>Bs → USD / Bs → EUR:</strong> Realiza el cálculo inverso (de bolívares a la divisa seleccionada).</div>
+      <div class="guia-item"><strong>Fichas rápidas (1, 5, 10, etc.):</strong> Botones de autocompletado instantáneo con montos comunes.</div>
+      <div class="guia-item"><strong>Actualizar Tasas:</strong> Consulta en tiempo real las últimas cotizaciones oficiales del BCV vía API.</div>
+      <div class="guia-item"><strong>Compartir Conversión:</strong> Genera una tarjeta de imagen impecable para enviar el resultado por WhatsApp o redes.</div>
+      <div class="guia-item"><strong>📋 Copiar:</strong> Al hacer clic en este botón (que aparece al calcular), copias el valor numérico limpio al portapapeles.</div>
+      <div class="guia-item"><strong>📈 / 📉 / ➖ (Tendencias):</strong> Muestran si la tasa oficial subió, bajó o se mantuvo en comparación con la última consulta guardada.</div>
+      <div class="guia-item"><strong>🔊 Botón inferior izquierdo:</strong> Activa o silencia los efectos de sonido táctiles de la app.</div>
+      <div class="guia-item"><strong>🌙 / ☀️ (Esquina superior):</strong> Alterna el tema visual entre modo oscuro y modo claro.</div>
+    </div>
+  </div>
+
+  <!-- Modal Acerca de -->
+  <div class="modal-overlay" id="modalAcercaDe">
+    <div class="modal-contenido">
+      <button id="cerrarModal" class="cerrar" aria-label="Cerrar">&times;</button>
+      <h2 id="modalTitulo">Acerca de BCVITO.IO</h2>
+      <p id="modalTexto1">
+        <strong>BCVITO.IO</strong> es una herramienta web creada para facilitar la conversión de dólares (USD) y euros (EUR) a bolívares (VES), utilizando como referencia las tasas oficiales del Banco Central de Venezuela (BCV). Herramienta independiente con fines informativos.
+      </p>
+      <p style="font-size: 14px; opacity: 0.85; margin-top: 15px;" id="modalAviso">
+        ⚠️ BCVITO.IO no se hace responsable por decisiones financieras tomadas con base en la información presentada.
+      </p>
+      <p style="margin-top: 20px; font-size: 12px; color: var(--text-muted);" id="modalConsejo">
+        💡 <strong>Consejo:</strong> Puedes instalar esta aplicación en tu dispositivo móvil para acceder rápidamente.
+      </p>
+      <p style="margin-top: 15px; font-size: 12px; color: #4fc3f7;" id="modalSonido">
+        🔊 Los sonidos pueden activarse/desactivarse con el botón inferior izquierdo.
+      </p>
+    </div>
+  </div>
+
+  <div class="logo-fijo" onclick="playSound('calculate')">
+    <img src="logo-bcvito.png" alt="BCVito.io Logo">
+  </div>
+
+  <div class="sound-toggle" id="soundToggle" title="Activar/Desactivar sonidos">🔊</div>
+
+  <footer>
+    <span id="footerTexto">Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: </span>
+    <a href="mailto:boflowolf@gmail.com">boflowolf@gmail.com</a>
+  </footer>
+
+  <script>
+    let conversionActual = 'usd-to-bs';
+    let ultimoResultado = null;
+    let deferredPrompt;
+    let soundsEnabled = true;
+    let audioContext = null;
+    let idiomaActual = 'es';
+
+    let tasaUSD = 0;
+    let tasaEUR = 0;
+    let tasaAnteriorUSD = 0;
+    let tasaAnteriorEUR = 0;
+
+    // Galería de fondos dinámicos variados de Venezuela
+    const fondosDisponibles = [
+      'https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg',
+      'https://anzoategui.gob.ve/wp-content/uploads/2025/08/GRAN-PLAZA-LIBERTADORES-BARCELONA-CRUDAS-64-1-scaled.jpg',
+      'https://images.mnstatic.com/c5/26/c52668c5b3c50a202a4e24b7186d0b4c.jpg',
+      'https://images.unsplash.com/photo-1576470294179-3fd4da59addc?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'https://live.staticflickr.com/65535/48975096752_515be82384_b.jpg'
+      
+    ];
+
+    function asignarFondoAleatorio() {
+      // Selecciona un fondo aleatorio de la lista al cargar la página
+      const randomIndex = Math.floor(Math.random() * fondosDisponibles.length);
+      const fondoElegido = fondosDisponibles[randomIndex];
+      
+      document.body.style.background = `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('${fondoElegido}')`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundAttachment = 'fixed';
+    }
+
+    const traducciones = {
+      es: {
+        titulo: "Calculadora Divisas ↔ VES (BCV)",
+        montoUSD: "Monto (USD)",
+        montoEUR: "Monto (EUR)",
+        montoBs: "Monto (Bs)",
+        tasaDia: "Tasa Del Día (Bs)",
+        placeholderUSD: "Ejemplo: 1$",
+        placeholderEUR: "Ejemplo: 1€",
+        placeholderBs: "Ejemplo: 100.000 Bs",
+        actualizar: "Actualizar Tasas",
+        descargar: "Compartir / Guardar",
+        acercaDe: "Acerca de",
+        guiaBtn: "❓ Guía",
+        instalar: "📲 Instalar App",
+        btnIdioma: "EN",
+        usdToBs: "USD → Bs",
+        bsToUsd: "Bs → USD",
+        eurToBs: "EUR → Bs",
+        bsToEur: "Bs → EUR",
+        copiar: "Copiar monto numérico",
+        copiado: "¡Copiado!",
+        guiaTitulo: "Guía de Uso de BCVito.io",
+        modalTitulo: "Acerca de BCVITO.IO",
+        modalTexto1: "<strong>BCVITO.IO</strong> es una herramienta web creada para facilitar la conversión de dólares (USD) y euros (EUR) a bolívares venezolanos (VES), utilizando como referencia las tasas oficiales del Banco Central de Venezuela (BCV).",
+        modalAviso: "⚠️ BCVITO.IO no se hace responsable por decisiones financieras tomadas con base en la información presentada.",
+        modalConsejo: "💡 <strong>Consejo:</strong> Puedes instalar esta aplicación en tu dispositivo móvil para acceder rápidamente.",
+        modalSonido: "🔊 Los sonidos pueden activarse/desactivarse con el botón en la esquina inferior izquierda.",
+        footerTexto: "Desarrollado por <strong>Fabián Fariñas</strong> · Contacto: ",
+        offline: "⚠️ Sin conexión a Internet",
+        errorCalculo: "Ingresa un monto para generar la imagen",
+        diasSemana: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        meses: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+      },
+      en: {
+        titulo: "Currency ↔ VES Calculator (BCV)",
+        montoUSD: "Amount (USD)",
+        montoEUR: "Amount (EUR)",
+        montoBs: "Amount (Bs)",
+        tasaDia: "Daily Rate (Bs)",
+        placeholderUSD: "Example: 1$",
+        placeholderEUR: "Example: 1€",
+        placeholderBs: "Example: 100,000 Bs",
+        actualizar: "Update Rates",
+        descargar: "Share / Save",
+        acercaDe: "About",
+        guiaBtn: "❓ Guide",
+        instalar: "📲 Install App",
+        btnIdioma: "ES",
+        usdToBs: "USD → Bs",
+        bsToUsd: "Bs → USD",
+        eurToBs: "EUR → Bs",
+        bsToEur: "Bs → EUR",
+        copiar: "Copy raw amount",
+        copied: "Copied!",
+        guiaTitulo: "BCVito.io User Guide",
+        modalTitulo: "About BCVITO.IO",
+        modalTexto1: "<strong>BCVITO.IO</strong> is a web tool created to facilitate the conversion of US dollars (USD) and Euros (EUR) to Venezuelan bolivars (VES), using BCV official rates.",
+        modalAviso: "⚠️ BCVITO.IO is not responsible for financial decisions made based on the information presented.",
+        modalConsejo: "💡 <strong>Tip:</strong> You can install this application on your mobile device for quick access.",
+        modalSonido: "🔊 Sounds can be toggled using the bottom-left button.",
+        footerTexto: "Developed by <strong>Fabián Fariñas</strong> · Contact: ",
+        offline: "⚠️ No Internet Connection",
+        errorCalculo: "Enter an amount to generate the image",
+        diasSemana: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        meses: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+      }
+    };
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    function vibrar() {
+      if (navigator.vibrate) navigator.vibrate(10);
+    }
+
+    function cambiarTema(forzarTema) {
+      vibrar();
+      const htmlEl = document.documentElement;
+      const themeToggleBtn = document.getElementById('themeToggle');
+      const metaThemeColor = document.getElementById('metaThemeColor');
+      
+      let temaActual = htmlEl.getAttribute('data-theme');
+      let nuevoTema = forzarTema ? forzarTema : (temaActual === 'dark' ? 'light' : 'dark');
+      
+      htmlEl.setAttribute('data-theme', nuevoTema);
+      localStorage.setItem('bcvitoTheme', nuevoTema);
+      
+      if (nuevoTema === 'light') {
+        themeToggleBtn.textContent = '☀️';
+        metaThemeColor.setAttribute('content', '#f0f2f5');
+      } else {
+        themeToggleBtn.textContent = '🌙';
+        metaThemeColor.setAttribute('content', '#0a0a0a');
+      }
+    }
+
+    function cambiarIdioma(idioma) {
+      idiomaActual = idioma;
+      localStorage.setItem('bcvitoIdioma', idioma);
+      
+      const btnIdioma = document.getElementById('btnIdioma');
+      btnIdioma.textContent = traducciones[idioma].btnIdioma;
+      btnIdioma.classList.toggle('active', idioma === 'en');
+      
+      actualizarTextos();
+      actualizarReloj();
+      generarChips();
+    }
+
+    function actualizarTextos() {
+      const t = traducciones[idiomaActual];
+      document.getElementById('tituloPrincipal').textContent = t.titulo;
+      
+      if (conversionActual === 'usd-to-bs') {
+        document.getElementById('montoLabel').textContent = t.montoUSD;
+        document.getElementById('monto').placeholder = t.placeholderUSD;
+      } else if (conversionActual === 'eur-to-bs') {
+        document.getElementById('montoLabel').textContent = t.montoEUR;
+        document.getElementById('monto').placeholder = t.placeholderEUR;
+      } else {
+        document.getElementById('montoLabel').textContent = t.montoBs;
+        document.getElementById('monto').placeholder = t.placeholderBs;
+      }
+
+      document.getElementById('tasaLabel').textContent = t.tasaDia;
+      document.getElementById('btnActualizar').textContent = t.actualizar;
+      document.getElementById('btnDescargar').textContent = t.descargar;
+      document.getElementById('btnAyuda').textContent = t.guiaBtn;
+      document.getElementById('btnAbrirModal').textContent = t.acercaDe;
+      document.getElementById('installButton').textContent = t.instalar;
+      
+      document.getElementById('usdToBsBtn').textContent = t.usdToBs;
+      document.getElementById('bsToUsdBtn').textContent = t.bsToUsd;
+      document.getElementById('eurToBsBtn').textContent = t.eurToBs;
+      document.getElementById('bsToEurBtn').textContent = t.bsToEur;
+      
+      document.getElementById('btnCopiar').title = t.copiar;
+      document.getElementById('toastCopiado').textContent = t.copiado;
+      
+      document.getElementById('guiaTitulo').textContent = t.guiaTitulo;
+      document.getElementById('modalTitulo').textContent = t.modalTitulo;
+      document.getElementById('modalTexto1').innerHTML = t.modalTexto1;
+      document.getElementById('modalAviso').innerHTML = t.modalAviso;
+      document.getElementById('modalConsejo').innerHTML = t.modalConsejo;
+      document.getElementById('modalSonido').innerHTML = t.modalSonido;
+      document.getElementById('footerTexto').innerHTML = t.footerTexto;
+      document.getElementById('offlineMsg').textContent = t.offline;
+    }
+
+    function initAudioContext() {
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playSound(type) {
+      if (!soundsEnabled || !audioContext) return;
+      try {
+        if (type === 'calculate') {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          osc.frequency.setValueAtTime(580, audioContext.currentTime);
+          osc.frequency.setValueAtTime(750, audioContext.currentTime + 0.04);
+          osc.type = 'sine';
+          gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
+          osc.start();
+          osc.stop(audioContext.currentTime + 0.12);
+        }
+      } catch (e) {}
+    }
+
+    function toggleSounds() {
+      vibrar();
+      soundsEnabled = !soundsEnabled;
+      const toggleBtn = document.getElementById('soundToggle');
+      if (soundsEnabled) {
+        toggleBtn.classList.remove('muted');
+        localStorage.setItem('bcvitoSounds', 'enabled');
+      } else {
+        toggleBtn.classList.add('muted');
+        localStorage.setItem('bcvitoSounds', 'disabled');
+      }
+    }
+
+    function generarChips() {
+      const container = document.getElementById('chipsContainer');
+      container.innerHTML = '';
+      
+      let valores = [1, 5, 10, 20, 50, 100];
+      let sufijo = '$';
+      
+      if (conversionActual === 'eur-to-bs') {
+        valores = [1, 5, 10, 20, 50, 100];
+        sufijo = '€';
+      } else if (conversionActual === 'usd-to-bs') {
+        valores = [1, 5, 10, 20, 50, 100];
+        sufijo = '$';
+      } else {
+        valores = [50, 100, 200, 500, 1000];
+        sufijo = ' Bs';
+      }
+
+      valores.forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'chip-btn';
+        btn.textContent = (sufijo === '$' || sufijo === '€') ? `${sufijo}${val}` : `${val}${sufijo}`;
+        btn.addEventListener('click', () => {
+          vibrar();
+          document.getElementById('monto').value = val;
+          calcular();
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    function actualizarConexion() {
+      document.getElementById('offlineMsg').style.display = navigator.onLine ? 'none' : 'block';
+    }
+    window.addEventListener('online', actualizarConexion);
+    window.addEventListener('offline', actualizarConexion);
+
+    function cambiarConversion(tipo) {
+      vibrar();
+      conversionActual = tipo;
+      
+      document.getElementById('usdToBsBtn').classList.toggle('active', tipo === 'usd-to-bs');
+      document.getElementById('bsToUsdBtn').classList.toggle('active', tipo === 'bs-to-usd');
+      document.getElementById('eurToBsBtn').classList.toggle('active', tipo === 'eur-to-bs');
+      document.getElementById('bsToEurBtn').classList.toggle('active', tipo === 'bs-to-eur');
+      
+      const tasaInput = document.getElementById('tasa');
+      if (tipo.includes('eur')) {
+        tasaInput.value = tasaEUR ? tasaEUR.toFixed(2) : '';
+      } else {
+        tasaInput.value = tasaUSD ? tasaUSD.toFixed(2) : '';
+      }
+
+      actualizarTextos();
+      generarChips();
+      calcular();
+    }
+
+    async function cargarTasasBCV() {
+      if (!navigator.onLine) {
+        habilitarEntradaManual();
+        return;
+      }
+      
+      try {
+        const respuesta = await fetch('https://ve.dolarapi.com/v1/cotizaciones');
+        if (!respuesta.ok) throw new Error('Error al conectar con la API');
+
+        const datos = await respuesta.json();
+        
+        const dolarOficial = datos.find(item => item.moneda === 'USD' && item.fuente === 'oficial');
+        const euroOficial = datos.find(item => item.moneda === 'EUR' && item.fuente === 'oficial');
+
+        const savedUSD = localStorage.getItem('tasaUSD');
+        const savedEUR = localStorage.getItem('tasaEUR');
+        if (savedUSD) tasaAnteriorUSD = Number(savedUSD);
+        if (savedEUR) tasaAnteriorEUR = Number(savedEUR);
+
+        if (dolarOficial && dolarOficial.promedio) tasaUSD = Number(dolarOficial.promedio);
+        if (euroOficial && euroOficial.promedio) tasaEUR = Number(euroOficial.promedio);
+
+      } catch (e) {
+        console.error('Error cargando cotizaciones:', e);
+      }
+
+      if (!tasaUSD || isNaN(tasaUSD)) {
+        habilitarEntradaManual();
+        return;
+      }
+
+      if (!tasaEUR || isNaN(tasaEUR)) tasaEUR = tasaUSD * 1.08;
+
+      const tasaInput = document.getElementById('tasa');
+      if (conversionActual.includes('eur')) {
+        tasaInput.value = tasaEUR.toFixed(2);
+      } else {
+        tasaInput.value = tasaUSD.toFixed(2);
+      }
+      tasaInput.readOnly = true;
+
+      localStorage.setItem('tasaUSD', tasaUSD);
+      localStorage.setItem('tasaEUR', tasaEUR);
+      
+      mostrarUltimaTasa();
+      calcular();
+    }
+
+    function habilitarEntradaManual() {
+      const tasaInput = document.getElementById('tasa');
+      tasaInput.readOnly = false;
+      tasaInput.placeholder = idiomaActual === 'es' ? 'Ingrese tasa manual' : 'Enter rate manually';
+    }
+
+    function calcular() {
+      const montoRaw = document.getElementById('monto').value;
+      const resultadoTextoElement = document.getElementById('resultadoTexto');
+      const btnCopiar = document.getElementById('btnCopiar');
+      
+      if (!montoRaw) {
+        resultadoTextoElement.textContent = '';
+        btnCopiar.style.display = 'none';
+        ultimoResultado = null;
+        return;
+      }
+
+      const monto = Number(montoRaw);
+      const tasa = Number(document.getElementById('tasa').value);
+      
+      if (!monto || !tasa) {
+        btnCopiar.style.display = 'none';
+        return;
+      }
+      
+      let resultadoTexto = '';
+      let valorNumericoLimpio = 0;
+      let tipoStr = '';
+      
+      if (conversionActual === 'usd-to-bs') {
+        const totalBs = (monto * tasa);
+        resultadoTexto = `Bs ${formatearNumero(totalBs)}`;
+        valorNumericoLimpio = totalBs.toFixed(2);
+        tipoStr = 'USD → Bs';
+        ultimoResultado = { tipo: tipoStr, origen: `${formatearNumero(monto)} $`, destino: `${formatearNumero(totalBs)} Bs`, tasa, fecha: new Date(), valorLimpio: valorNumericoLimpio.replace('.', ',') };
+      } else if (conversionActual === 'bs-to-usd') {
+        const totalUsd = (monto / tasa);
+        resultadoTexto = `$ ${formatearNumero(totalUsd)} USD`;
+        valorNumericoLimpio = totalUsd.toFixed(2);
+        tipoStr = 'Bs → USD';
+        ultimoResultado = { tipo: tipoStr, origen: `${formatearNumero(monto)} Bs`, destino: `${formatearNumero(totalUsd)} $`, tasa, fecha: new Date(), valorLimpio: valorNumericoLimpio.replace('.', ',') };
+      } else if (conversionActual === 'eur-to-bs') {
+        const totalBs = (monto * tasa);
+        resultadoTexto = `Bs ${formatearNumero(totalBs)}`;
+        valorNumericoLimpio = totalBs.toFixed(2);
+        tipoStr = 'EUR → Bs';
+        ultimoResultado = { tipo: tipoStr, origen: `${formatearNumero(monto)} €`, destino: `${formatearNumero(totalBs)} Bs`, tasa, fecha: new Date(), valorLimpio: valorNumericoLimpio.replace('.', ',') };
+      } else {
+        const totalEur = (monto / tasa);
+        resultadoTexto = `€ ${formatearNumero(totalEur)} EUR`;
+        valorNumericoLimpio = totalEur.toFixed(2);
+        tipoStr = 'Bs → EUR';
+        ultimoResultado = { tipo: tipoStr, origen: `${formatearNumero(monto)} Bs`, destino: `${formatearNumero(totalEur)} €`, tasa, fecha: new Date(), valorLimpio: valorNumericoLimpio.replace('.', ',') };
+      }
+      
+      resultadoTextoElement.textContent = resultadoTexto;
+      btnCopiar.style.display = 'flex';
+      
+      const resultadoElement = document.getElementById('resultado');
+      resultadoElement.classList.add('animado');
+      playSound('calculate');
+      setTimeout(() => resultadoElement.classList.remove('animado'), 300);
+    }
+
+    function formatearNumero(num) {
+      return num.toLocaleString(idiomaActual === 'es' ? 'es-VE' : 'en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function obtenerBadgeTendencia(actual, anterior) {
+      if (!anterior || anterior === 0) return '';
+      const diff = actual - anterior;
+      if (Math.abs(diff) < 0.001) {
+        return `<span class="trend-badge trend-flat" title="Sin cambios respecto a la última consulta">➖ 0.00%</span>`;
+      } else if (diff > 0) {
+        const pct = ((diff / anterior) * 100).toFixed(2);
+        return `<span class="trend-badge trend-up" title="Subió respecto a la última consulta">📈 +${pct}%</span>`;
+      } else {
+        const pct = ((Math.abs(diff) / anterior) * 100).toFixed(2);
+        return `<span class="trend-badge trend-down" title="Bajó respecto a la última consulta">📉 -${pct}%</span>`;
+      }
+    }
+
+    function mostrarUltimaTasa() {
+      const ahora = new Date();
+      const fechaFormateada = ahora.toLocaleDateString(idiomaActual === 'es' ? 'es-VE' : 'en-US');
+      const horaFormateada = ahora.toLocaleTimeString(idiomaActual === 'es' ? 'es-VE' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+
+      const badgeUSD = obtenerBadgeTendencia(tasaUSD, tasaAnteriorUSD);
+      const badgeEUR = obtenerBadgeTendencia(tasaEUR, tasaAnteriorEUR);
+
+      document.getElementById('ultimaTasa').innerHTML =
+        `USD: <strong>Bs ${formatearNumero(tasaUSD)}</strong> ${badgeUSD} | EUR: <strong>Bs ${formatearNumero(tasaEUR)}</strong> ${badgeEUR}<br>` +
+        `<small>BCV Oficial · ${fechaFormateada} ${horaFormateada}</small>`;
+    }
+
+    function actualizarReloj() {
+      const a = new Date();
+      const t = traducciones[idiomaActual];
+      const diaSemana = t.diasSemana[a.getDay()];
+      const dia = a.getDate();
+      const mes = t.meses[a.getMonth()];
+      let horaFormateada = a.toLocaleTimeString(idiomaActual === 'es' ? 'es-VE' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      
+      document.getElementById('reloj').innerHTML = `${diaSemana}, ${dia} de ${mes}<br>${horaFormateada}`;
+    }
+
+    function generarImagen() {
+      vibrar();
+      if (!ultimoResultado) {
+        alert(traducciones[idiomaActual].errorCalculo);
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1080; 
+      const ctx = canvas.getContext('2d');
+
+      let gradiente = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradiente.addColorStop(0, '#141416');
+      gradiente.addColorStop(1, '#080809');
+      ctx.fillStyle = gradiente;
+      ctx.fillRect(0, 0, 1080, 1080);
+
+      ctx.fillStyle = '#F4D03F'; ctx.fillRect(0, 0, 360, 15);
+      ctx.fillStyle = '#0033A0'; ctx.fillRect(360, 0, 360, 15);
+      ctx.fillStyle = '#D52B1E'; ctx.fillRect(720, 0, 360, 15);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#FFFFFF';
+
+      ctx.font = 'bold 56px system-ui, Arial';
+      ctx.fillText('BCVITO.IO', 540, 180);
+
+      ctx.font = '600 36px system-ui, Arial';
+      ctx.fillStyle = '#b3b3b3';
+      ctx.fillText(ultimoResultado.tipo, 540, 250);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      ctx.fillRect(140, 320, 800, 420);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '500 48px system-ui, Arial';
+      ctx.fillText(`${ultimoResultado.origen}`, 540, 420);
+
+      ctx.font = '40px system-ui, Arial';
+      ctx.fillStyle = '#667eea';
+      ctx.fillText(`Tasa Oficial: Bs ${ultimoResultado.tasa.toFixed(2)}`, 540, 500);
+
+      ctx.font = 'bold 76px system-ui, Arial';
+      ctx.fillStyle = '#2ecc71';
+      ctx.fillText(ultimoResultado.destino, 540, 640);
+
+      ctx.fillStyle = '#b3b3b3';
+      ctx.font = '30px system-ui, Arial';
+      const fFormated = ultimoResultado.fecha.toLocaleDateString() + ' ' + ultimoResultado.fecha.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      ctx.fillText(fFormated, 540, 840);
+
+      ctx.font = 'italic 32px system-ui, Arial';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('Tasa Oficial BCV Informativa', 540, 920);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'bcvito-share.png', { type: 'image/png' });
+        
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: 'BCVito.io', text: `Tasa: Bs ${ultimoResultado.tasa.toFixed(2)}` });
+          } catch (e) {}
+        } else {
+          const dataURL = canvas.toDataURL('image/png');
+          const win = window.open();
+          if (win) win.document.write(`<body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;height:100vh;"><img src="${dataURL}" style="max-width:100%;max-height:100%;"></body>`);
+        }
+      }, 'image/png');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initAudioContext();
+      
+      // Asignar fondo dinámico aleatorio al iniciar
+      asignarFondoAleatorio();
+      
+      const savedTheme = localStorage.getItem('bcvitoTheme');
+      if (savedTheme) {
+        cambiarTema(savedTheme);
+      } else {
+        cambiarTema('dark');
+      }
+
+      const savedLanguage = localStorage.getItem('bcvitoIdioma');
+      if (savedLanguage) cambiarIdioma(savedLanguage);
+      else cambiarIdioma('es');
+      
+      if (localStorage.getItem('bcvitoSounds') === 'disabled') {
+        soundsEnabled = false;
+        document.getElementById('soundToggle').classList.add('muted');
+      }
+
+      document.getElementById('themeToggle').addEventListener('click', () => cambiarTema());
+      document.getElementById('btnIdioma').addEventListener('click', () => cambiarIdioma(idiomaActual === 'es' ? 'en' : 'es'));
+      document.getElementById('soundToggle').addEventListener('click', toggleSounds);
+      document.getElementById('btnActualizar').addEventListener('click', () => { vibrar(); cargarTasasBCV(); });
+      document.getElementById('btnDescargar').addEventListener('click', generarImagen);
+      document.getElementById('monto').addEventListener('input', calcular);
+      document.getElementById('tasa').addEventListener('input', calcular);
+      
+      document.getElementById('usdToBsBtn').addEventListener('click', () => cambiarConversion('usd-to-bs'));
+      document.getElementById('bsToUsdBtn').addEventListener('click', () => cambiarConversion('bs-to-usd'));
+      document.getElementById('eurToBsBtn').addEventListener('click', () => cambiarConversion('eur-to-bs'));
+      document.getElementById('bsToEurBtn').addEventListener('click', () => cambiarConversion('bs-to-eur'));
+      
+      document.getElementById('btnCopiar').addEventListener('click', () => {
+        vibrar();
+        if (!ultimoResultado || !ultimoResultado.valorLimpio) return;
+        navigator.clipboard.writeText(ultimoResultado.valorLimpio).then(() => {
+          const toast = document.getElementById('toastCopiado');
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 1800);
+        });
+      });
+      
+      // Control de Modales
+      const modalAcerca = document.getElementById('modalAcercaDe');
+      document.getElementById('btnAbrirModal').addEventListener('click', () => { modalAcerca.style.display = 'flex'; setTimeout(() => modalAcerca.classList.add('visible'), 10); });
+      const cerrarAcerca = () => { modalAcerca.classList.remove('visible'); setTimeout(() => modalAcerca.style.display = 'none', 300); };
+      document.getElementById('cerrarModal').addEventListener('click', cerrarAcerca);
+      modalAcerca.addEventListener('click', e => { if (e.target === modalAcerca) cerrarAcerca(); });
+
+      const modalGuia = document.getElementById('modalGuia');
+      document.getElementById('btnAyuda').addEventListener('click', () => { modalGuia.style.display = 'flex'; setTimeout(() => modalGuia.classList.add('visible'), 10); });
+      const cerrarGuia = () => { modalGuia.classList.remove('visible'); setTimeout(() => modalGuia.style.display = 'none', 300); };
+      document.getElementById('cerrarModalGuia').addEventListener('click', cerrarGuia);
+      modalGuia.style.display = 'none'; // Asegurar oculto inicialmente si hiciera falta
+      modalGuia.addEventListener('click', e => { if (e.target === modalGuia) cerrarGuia(); });
+
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('installButton');
+        installBtn.style.display = 'block';
+        installBtn.addEventListener('click', async () => {
+          deferredPrompt.prompt();
+          deferredPrompt = null;
+        });
+      });
+
+      actualizarConexion();
+      actualizarReloj();
+      cargarTasasBCV();
+      setInterval(actualizarReloj, 1000);
+    });
+  </script>
+</body>
+</html>
